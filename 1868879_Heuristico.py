@@ -1,9 +1,21 @@
+import logging
+
+log = logging.getLogger() # 'root' Logger
+console = logging.StreamHandler() # Setea un handler
+
+format_str = '%(levelname)s -- %(filename)s:%(lineno)s -- %(message)s'  # Formato de logging
+console.setFormatter(logging.Formatter(format_str)) # Setea el logger con el formato
+
+log.addHandler(console) # imprime en consola
+log.setLevel(logging.INFO) # todo de logging.INFO()
+
+
 n_nodos = 11
 M = 50
 T = 300
 C = T - 50
 
-productos = [50, 86, 78, 64, 22, 98, 82, 87, 52, 100, 99]
+productos = [52, 86, 78, 64, 22, 98, 82, 87, 52, 100, 99]
 
 matrizTiempos = [
     [0,	8,	15,	7,	16,	15,	9,	14,	20,	14,	9],
@@ -38,45 +50,60 @@ def verifyProducts():
 
 flag = False
 
-################## Fin - Generar Tour TSP ################## 
-while( not flag ): # El ciclo dura n_nodos - 1 para así reservar el último puesto para el 
-    # cliente inicial
-    costo_min = max( matrizTiempos[indice_cliente] ) # Se encuentra el valor máximo de la fila
-    for i in range(n_nodos): # Aquí se recorren todos los clientes de la fila actual
-        # Se compara el costo de cada cliente para encontrar el valor mínimo y se valida también que 
-        # el costo no sea 0
+# Generar Tour TSP
+while( not flag ):
+    # El ciclo dura n_nodos - 1 para así reservar el último puesto para el cliente inicial
+    costo_min = max( matrizTiempos[indice_cliente] )
+    # Se encuentra el valor máximo de la fila
+    logging.info('Valor máximo en fila actual %i', costo_min)
+    # Log valor de costo_min
+
+    for i in range(n_nodos): 
+        # Aquí se recorren todos los clientes de la fila actual
+        
+
         if ( matrizTiempos[indice_cliente][i] < costo_min):
-            # Se verifica que el cliente no se encuentre ya en la lista del tour
-            # Si se encuentra se continua fuera del if-else o si i = j (diagonal de 0s) se excluye
+            # Se compara el costo de cada cliente para encontrar el valor mínimo y se valida también que 
+            # el costo no sea 0
+            
+            
             if ( ( i in lista_temp ) or ( i == indice_cliente) ):
+                # Se verifica que el cliente no se encuentre ya en la lista del tour
+                # Si se encuentra se continua fuera del if-else o si i = j (diagonal de 0s) se excluye
                 continue
-            # Si no se encuentra se considera para poder encontrar el valor mínimo
+           
             else:
+                 # Si no se encuentra se considera para poder encontrar el valor mínimo
                 costo_min = matrizTiempos[indice_cliente][i] # Se guarda el valor del costo mínimo en la variable
                 i_costo_minimo = i 
+                logging.info('Valor de i_costo_minimo: %i', i_costo_minimo)
 
 
     sumaTiempos = matrizTiempos[indice_cliente][i_costo_minimo] + productos[i_costo_minimo] + matrizTiempos[0][i_costo_minimo]
+    logging.info('Valor de sumaTiempos: %i', sumaTiempos)
 
     if( ( tiempo_periodo_temp + sumaTiempos ) < C):
         # El número del cliente sería igual a su índice (matriz)
-        lista_temp.append(i_costo_minimo) # Y ya se agrega el cliente con el menor costo a la lista del 
+        lista_temp.append(i_costo_minimo) # Y ya se agrega el cliente con el menor costo a la lista del
+        logging.info(lista_temp) 
         # tour después de las validaciones
         tiempo_periodo_temp = tiempo_periodo_temp + ( matrizTiempos[indice_cliente][i_costo_minimo] + productos[i_costo_minimo] )
         indice_cliente = i_costo_minimo # Se guarda el índice del último cliente que se ha añadido para 
         # encontrar el nuevo cliente
         
     else:
-        lista_temp.append(0) # Se agrega el nodo 0 (Mantenimiento) debido a que ya no caben más productos
-        indice_cliente = 0 # Se guarda el índice con 0 (Mantenimiento)
-        tiempo_periodo_temp = 0 # Se reinicia el tiempo del periodo
+        lista_temp.append(0) 
+        indice_cliente = 0 
+        tiempo_periodo_temp = 0 
+    # Si no
+        # Se agrega el nodo 0 (Mantenimiento) porque ya no caben más productos
+        # Se guarda el ínide con 0, que es el Mantenimient
+        # Se reinicia el tiempo del periodo
 
     flag = verifyProducts()
 # Fin del for para todos los nodos
 
-       
-
-################## Fin - Generar Tour TSP ################## 
+    
 
 
 lista_temp.pop(0)
